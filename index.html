@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISION's Book Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main">
+        <nav>
+            <div class="navbar">
+                <div id="NAVhome"><a href="try.html">VISION's Book Library</a></div>
+                <div id="NAVsearch"><i class="fa-solid fa-book-open-reader"></i>&nbsp;<input type="text" id="searchbar" placeholder="Search Books..."></div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="categorysection">
+                <div class="categorylist" id="Web"><i class="fa-solid fa-tag"></i> Web</div>
+                <div class="categorylist" id="Programming_Languages"><i class="fa-solid fa-tag"></i> Programming Languages</div>
+                <div class="categorylist" id="UI_UX"><i class="fa-solid fa-tag"></i> UI/UX</div>
+                <div class="categorylist" id="App_Development"><i class="fa-solid fa-tag"></i> App Development</div>
+                <div class="categorylist" id="CyberSecurity"><i class="fa-solid fa-tag"></i> CyberSecurity</div>
+            </div>
+            <div class="ALLSection" id="ALL"><i class="fa-solid fa-tag"></i>&nbsp; All Books...</div>
+            <form class="addingbookform" id="addingbookform">
+                <input type="text" id="booktitle" placeholder="Book Title" required>
+                <input type="text" id="bookauthor" placeholder="Book Author" required>
+                <select id="bookcategory" required>
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="Web">Web</option>
+                    <option value="Programming Languages">Programming Languages</option>
+                    <option value="UI UX">UI/UX</option>
+                    <option value="App Development">App Development</option>
+                    <option value="CyberSecurity">CyberSecurity</option>
+                </select>
+                <button type="submit">Add Book</button>
+            </form>
+            <div class="bookgrid" id="bookgrid"></div>
+        </div>
+        <div class="historycontainer">
+            <button id="togglehistory">Toggle History</button>
+            <ul id="historylist"></ul>
+            <button id="clearlog">Clear Log</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://kit.fontawesome.com/57e4224dea.js" crossorigin="anonymous"></script>
+</body>
+</html>
