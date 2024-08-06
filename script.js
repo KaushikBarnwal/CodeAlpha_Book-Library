@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const addingBookForm = document.getElementById('addingbookform');
     const bookGrid = document.getElementById('bookgrid');
@@ -39,17 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
         { title: 'Cybersecurity Essentials', author: 'Charles J. Brooks, Christopher Grow, Philip Craig, and Donald Short', category: 'CyberSecurity' }
     ];
 
-    // let books = defaultBooks;
+    // Initialize books and history from localStorage or use defaults
     let books = JSON.parse(localStorage.getItem('books')) || defaultBooks;
     let history = JSON.parse(localStorage.getItem('history')) || [];
 
+    // Render books
     function renderBooks(filteredBooks = books) {
-        // console.log('Rendering books:', books); // Debugging log
-        bookGrid.innerHTML = '';
-        filteredBooks.forEach((book, index) => {
-            const bookItem = document.createElement('div');
-            bookItem.className = 'bookitem';
-            bookItem.innerHTML = `
+        bookGrid.innerHTML = filteredBooks.map((book, index) => `
+            <div class="bookitem">
                 <img src="bookCover.jpg" alt="${book.title}">
                 <div class="bookdetails">
                     <h3>${book.title}</h3>
@@ -58,70 +54,81 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <button class="borrowbtn" data-index="${index}">Borrow</button>
                 <button class="deletebtn" data-index="${index}">Delete</button>
-            `;
-            bookGrid.appendChild(bookItem);
-        });
-        attachEvents();
+            </div>
+        `).join('');
+        attachBookEvents();
     }
+
+    // Render history
     function renderHistory() {
-        // console.log('Rendering history:', history); // Debugging log
-        historyList.innerHTML = '';
-        history.forEach(record => {
-            const historyItem = document.createElement('li');
-            historyItem.innerHTML = `
-                <b>${record.title}</b> by <b>${record.author}</b> was borrowed on <b>${record.date}, ${record.time}</b>
-            `;
-            historyList.appendChild(historyItem);
-        });
+        historyList.innerHTML = history.map(record => `
+            <li><b>${record.title}</b> by <b>${record.author}</b> was borrowed on <b>${record.date}, ${record.time}</b></li>
+        `).join('');
     }
+
+    // Add a new book
     function addBook(title, author, category) {
         books.unshift({ title, author, category });
-        localStorage.setItem('books', JSON.stringify(books));
+        updateLocalStorage('books', books);
         renderBooks();
     }
+
+    // Delete a book
     function deleteBook(index) {
         books.splice(index, 1);
-        localStorage.setItem('books', JSON.stringify(books));
+        updateLocalStorage('books', books);
         renderBooks();
     }
+
+    // Borrow a book
     function borrowBook(index) {
         const book = books[index];
         const date = new Date().toLocaleDateString();
         const time = new Date().toLocaleTimeString();
         history.unshift({ ...book, date, time });
-        localStorage.setItem('history', JSON.stringify(history));
+        updateLocalStorage('history', history);
         renderHistory();
     }
+
+    // Clear history log
     function clearLog() {
         history = [];
-        localStorage.setItem('history', JSON.stringify(history));
+        updateLocalStorage('history', history);
         renderHistory();
     }
-    function attachEvents() {
-        const deleteButtons = document.querySelectorAll('.deletebtn');
-        const borrowButtons = document.querySelectorAll('.borrowbtn');
 
-        deleteButtons.forEach(button => {
+    // Update localStorage
+    function updateLocalStorage(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // Attach events for books
+    function attachBookEvents() {
+        bookGrid.querySelectorAll('.deletebtn').forEach(button => {
             button.addEventListener('click', () => {
-                const index = button.getAttribute('data-index');
-                deleteBook(index);
+                deleteBook(button.dataset.index);
             });
         });
-        borrowButtons.forEach(button => {
+
+        bookGrid.querySelectorAll('.borrowbtn').forEach(button => {
             button.addEventListener('click', () => {
-                const index = button.getAttribute('data-index');
-                borrowBook(index);
+                borrowBook(button.dataset.index);
             });
         });
+    }
+
+    // Attach general events
+    function attachGeneralEvents() {
         clearLogButton.addEventListener('click', () => {
-            const AdminConfirm = confirm('Are you sure you want to clear the borrowing history?');
-            if (AdminConfirm) {
+            if (confirm('Are you sure you want to clear the borrowing history?')) {
                 clearLog();
             }
         });
+
         toggleHistoryButton.addEventListener('click', () => {
             historyContainer.classList.toggle('active');
         });
+
         searchBar.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
             const filteredBooks = books.filter(book =>
@@ -129,35 +136,29 @@ document.addEventListener('DOMContentLoaded', () => {
             );
             renderBooks(filteredBooks);
         });
+
         categoryLists.forEach(category => {
             category.addEventListener('click', () => {
-                const thatCategory = category.id.replace('_', ' ').replace('/', ' ');
-                // console.log('Selected category:', thatCategory); // Debugging log
-                const filteredBooks = books.filter(book => book.category === thatCategory);
-                // console.log('Filtered books:', filteredBooks); // Debugging log
+                const categoryName = category.id.replace('_', ' ').replace('/', ' ');
+                const filteredBooks = books.filter(book => book.category === categoryName);
                 renderBooks(filteredBooks);
             });
         });
-        allSection.addEventListener('click', () => {
-            renderBooks();
-        });
-        
+
+        allSection.addEventListener('click', renderBooks);
     }
+
     addingBookForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const title = document.getElementById('booktitle').value;
         const author = document.getElementById('bookauthor').value;
         const category = document.getElementById('bookcategory').value;
-        // console.log('Adding book:', { title, author, category }); // Debugging log
         addBook(title, author, category);
         addingBookForm.reset();
     });
 
-    // console.log('Initial render:', books); // Debugging log
+    // Initial render
     renderBooks();
     renderHistory();
-
-    // Clear all localStorage data
-    // localStorage.clear();
-    // localStorage.removeItem('books');
+    attachGeneralEvents();
 });
